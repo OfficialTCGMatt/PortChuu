@@ -38,58 +38,58 @@ public class CmdGraylist implements TabExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
 
-        sender.sendMessage("Graylist not yet implemented");
-        return true;
-//
-//        if (sender.hasPermission(ADD_PERM)) {
-//            if (args.length > 2) {
-//                sender.sendMessage(usageAdd());
-//            }
-//
-//            if (args[0].equalsIgnoreCase(ADD)) {
-//                addThen(args[1], (ts, name) -> {
-//                    if (ts == Tristate.UNDEFINED) {
-//                        sender.sendMessage("Couldn't add " + name);
-//                    } else if (ts.asBoolean()) {
-//                        sender.sendMessage(name + " Success");
-//                    } else {
-//                        sender.sendMessage(name + " Failure");
-//                    }
-//                }).thenAcceptAsync(lp -> {
-//                    if (!lp)
-//                        sender.sendMessage("LP couldn't load");
-//                });
-//            } else if (args[0].equalsIgnoreCase(CHECK)) {
-//                checkThen(args[1], (has, name) -> {
-//                    if (has)
-//                        sender.sendMessage(name + " has it");
-//                    else
-//                        sender.sendMessage(name + " does not have it");
-//                }).thenAcceptAsync(lp -> {
-//                    if (!lp)
-//                        sender.sendMessage("LP couldn't load");
-//                });
-//            }
-//            return true;
-//        }
-//
-//        if (args.length == 0) {
-//            sender.sendMessage("You're not graylisted yet!");
-//        }
-//
-//        if (args.length == 1) {
-//            checkThen(args[0], (has, name) -> {
-//                if (has)
-//                    sender.sendMessage(name + " has it");
-//                else
-//                    sender.sendMessage(name + " does not have it");
-//            }).thenAcceptAsync(lp -> {
-//                if (!lp)
-//                    sender.sendMessage("LP couldn't load");
-//            });
-//        }
-//
+//        sender.sendMessage("Graylist not yet implemented");
 //        return true;
+
+       if (sender.hasPermission(ADD_PERM)) {
+            if (args.length != 2)
+                sender.sendMessage(usageAdd());
+            else {
+                if (args[0].equalsIgnoreCase(ADD)) {
+                    addThen(args[1], (ts, name) -> {
+                        if (ts == Tristate.UNDEFINED) {
+                            sender.sendMessage("Couldn't add " + name);
+                        } else if (ts.asBoolean()) {
+                            sender.sendMessage(name + " Success");
+                        } else {
+                            sender.sendMessage(name + " Failure");
+                        }
+                    }).thenAcceptAsync(lp -> {
+                        if (!lp)
+                            sender.sendMessage("LP couldn't load");
+                    });
+                } else if (args[0].equalsIgnoreCase(CHECK)) {
+                    checkThen(args[1], (has, name) -> {
+                        if (has)
+                            sender.sendMessage(name + " has it");
+                        else
+                            sender.sendMessage(name + " does not have it");
+                    }).thenAcceptAsync(lp -> {
+                        if (!lp)
+                            sender.sendMessage("LP couldn't load");
+                    });
+                }
+            }
+            return true;
+        }
+
+        if (args.length == 0) {
+            sender.sendMessage("You're not graylisted yet!");
+        }
+
+        if (args.length == 1) {
+            checkThen(args[0], (has, name) -> {
+                if (has)
+                    sender.sendMessage(name + " has it");
+                else
+                    sender.sendMessage(name + " does not have it");
+            }).thenAcceptAsync(lp -> {
+                if (!lp)
+                    sender.sendMessage("LP couldn't load");
+           });
+       }
+
+       return true;
     }
 
     private CompletableFuture<Boolean> getUserThen(String name, BiConsumer<LuckPerms, User> then) {
@@ -146,6 +146,7 @@ public class CmdGraylist implements TabExecutor {
 
     private CompletableFuture<Boolean> addThen(String name, BiConsumer<Tristate, String> then) {
         return getUserThen(name, (lp, user) -> {
+
             Tristate checkPerm = user.getCachedData().getPermissionData(QueryOptions.nonContextual()).checkPermission(GRAYLIST_PERM);
             if (checkPerm.asBoolean()) {
                 then.accept(Tristate.UNDEFINED, user.getUsername());
